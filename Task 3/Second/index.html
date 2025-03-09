@@ -1,0 +1,81 @@
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+
+const initialProjects = [
+  { id: 1, title: "Build a Solar Water Purifier", goal: 5000, raised: 2500 },
+  { id: 2, title: "Open-Source AI Research", goal: 10000, raised: 7200 },
+];
+
+export default function CrowdfundingApp() {
+  const [projects, setProjects] = useState(initialProjects);
+  const [newProject, setNewProject] = useState({ title: "", goal: "" });
+
+  const addProject = () => {
+    if (newProject.title && newProject.goal) {
+      setProjects([
+        ...projects,
+        {
+          id: projects.length + 1,
+          title: newProject.title,
+          goal: Number(newProject.goal),
+          raised: 0,
+        },
+      ]);
+      setNewProject({ title: "", goal: "" });
+    }
+  };
+
+  const contribute = (id, amount) => {
+    setProjects(
+      projects.map((proj) =>
+        proj.id === id ? { ...proj, raised: proj.raised + amount } : proj
+      )
+    );
+  };
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">🚀 Crowdfunding Platform</h1>
+      <div className="mb-4 flex gap-2">
+        <Input
+          placeholder="Project Title"
+          value={newProject.title}
+          onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+        />
+        <Input
+          type="number"
+          placeholder="Funding Goal"
+          value={newProject.goal}
+          onChange={(e) => setNewProject({ ...newProject, goal: e.target.value })}
+        />
+        <Button onClick={addProject}>Add Project</Button>
+      </div>
+      <div className="grid gap-4">
+        {projects.map((proj) => (
+          <motion.div
+            key={proj.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="p-4">
+              <CardContent>
+                <h2 className="text-lg font-semibold">{proj.title}</h2>
+                <p className="text-sm text-gray-500">Goal: ${proj.goal} | Raised: ${proj.raised}</p>
+                <Button
+                  className="mt-2"
+                  onClick={() => contribute(proj.id, 100)}
+                >
+                  Contribute $100
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
